@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Atul Krishnan S</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Atul Krishnan S, Software Engineer and Senior Data Engineer in Kochi. Software, lakehouse platforms and data pipelines on AWS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a workbench on graph paper. One steel pipe runs down the left edge of the page;
+   each section is a stage bolted onto it (ingest → transform → load → serve) and packets
+   flow through it. A valve in the hero stops and starts the flow. */
+:root {
+  --bg: #E8EBE7;
+  --grid: #DADFDA;
+  --surface: #F6F7F4;
+  --ink: #1B1F22;
+  --muted: #5C666C;
+  --line: #C6CDC8;
+  --accent: #D9481C;      /* signal orange */
+  --pipe: #98A4AB;        /* steel */
+  --led-ok: #239A5E;
+  --led-idle: #C98A0E;
+
+  --f-display: "Chakra Petch", "Bahnschrift", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --pipe-x: 28px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111416; --grid: #1A1F22; --surface: #171C1F; --ink: #E3E8EA; --muted: #8D989E; --line: #2B3337;
+    --accent: #FF7547; --pipe: #3E4A51; --led-ok: #44C985; --led-idle: #E8B13E; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111416; --grid: #1A1F22; --surface: #171C1F; --ink: #E3E8EA; --muted: #8D989E; --line: #2B3337;
+  --accent: #FF7547; --pipe: #3E4A51; --led-ok: #44C985; --led-idle: #E8B13E; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body); font-size: 1rem; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--accent); color: var(--surface); }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; line-height: 1.1; text-wrap: balance; }
+.mono { font-family: var(--f-mono); }
+
+.wrap {
+  max-width: 920px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Top bar */
+.top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 18px; flex-wrap: wrap; }
+.logo { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; color: var(--ink); text-decoration: none; letter-spacing: .02em; }
+.logo span { color: var(--accent); }
+.top nav { display: flex; gap: 18px; flex-wrap: wrap; font-family: var(--f-mono); font-size: .85rem; }
+.top nav a { color: var(--muted); text-decoration: none; }
+.top nav a:hover { color: var(--accent); }
+
+/* ---------- The pipe ---------- */
+.pipeline { position: relative; padding-left: calc(var(--pipe-x) + 36px); }
+.pipeline::before {
+  content: ""; position: absolute; left: calc(var(--pipe-x) - 5px); top: 10px; bottom: 0; width: 10px;
+  background: var(--pipe); border-radius: 5px;
+}
+.flow { position: absolute; left: calc(var(--pipe-x) - 3px); top: 10px; bottom: 0; width: 6px; overflow: hidden; border-radius: 3px; pointer-events: none; }
+.flow i {
+  position: absolute; left: 0; width: 6px; height: 14px; border-radius: 3px; background: var(--accent);
+  top: -20px; animation: flow 6s linear infinite;
+}
+.flow i:nth-child(2) { animation-delay: -1.5s; }
+.flow i:nth-child(3) { animation-delay: -3s; height: 8px; }
+.flow i:nth-child(4) { animation-delay: -4.5s; }
+@keyframes flow { to { top: 100%; } }
+.pipeline.paused .flow i { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .flow i { animation: none; display: none; } }
+
+.stage { position: relative; padding-block: 48px; }
+.joint {
+  position: absolute; left: calc(-36px - 15px); top: 52px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface); border: 3px solid var(--ink);
+  display: grid; place-items: center;
+  font-family: var(--f-mono); font-size: .72rem; font-weight: 500; z-index: 1;
+}
+.stage-label { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.stage-label b { color: var(--accent); font-weight: 500; }
+h2 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 700; margin-top: 6px; }
+.stage-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.stage-head .note { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); }
+
+/* ---------- Hero ---------- */
+.hero { display: grid; grid-template-columns: 1.4fr 1fr; gap: 36px; align-items: center; }
+.hero-text { min-width: 0; }
+h1 { font-size: clamp(2.6rem, 8vw, 4.6rem); font-weight: 700; letter-spacing: -0.01em; margin-top: 8px; }
+.tagline { font-size: 1.15rem; margin: 16px 0 0; max-width: 40ch; }
+.tagline b { color: var(--accent); font-weight: 600; }
+
+.plate {
+  position: relative; background: var(--surface); border: 2px solid var(--ink); border-radius: 6px;
+  padding: 18px 20px; font-family: var(--f-mono); font-size: .82rem; min-width: 0;
+}
+.plate::before, .plate::after, .plate .screw-b::before, .plate .screw-b::after {
+  content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--pipe); box-shadow: inset 0 0 0 1px var(--ink);
+}
+.plate::before { top: 7px; left: 7px; } .plate::after { top: 7px; right: 7px; }
+.plate .screw-b::before { bottom: 7px; left: 7px; } .plate .screw-b::after { bottom: 7px; right: 7px; }
+.plate-title { font-family: var(--f-display); font-weight: 700; font-size: .95rem; letter-spacing: .12em; text-align: center; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 10px; }
+.plate dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+.plate dt { color: var(--muted); text-transform: uppercase; font-size: .72rem; letter-spacing: .06em; padding-top: 2px; }
+.plate dd { margin: 0; }
+.valve {
+  display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line);
+  width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer;
+  font: 500 .8rem var(--f-mono); color: var(--ink); text-align: left;
+}
+.valve .knob { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ink); position: relative; background: var(--accent); transition: transform .3s; flex: none; }
+.valve .knob::after { content: ""; position: absolute; left: 50%; top: 2px; width: 2px; height: 14px; margin-left: -1px; background: var(--surface); }
+.valve[aria-pressed="false"] .knob { transform: rotate(90deg); background: var(--pipe); }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
+
+/* ---------- Projects: parts on the bench ---------- */
+.projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 680px) { .projects { grid-template-columns: 1fr; } }
+.proj {
+  position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 0;
+  padding: 18px 18px 16px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 6px;
+  color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s;
+}
+.proj:hover, .proj:focus-visible { border-color: var(--ink); transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--accent); outline: none; }
+@media (prefers-reduced-motion: reduce) { .proj { transition: none; } .proj:hover { transform: none; } }
+.proj-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.led { display: inline-flex; align-items: center; gap: 6px; }
+.led::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--pipe); }
+.led.ok::before { background: var(--led-ok); box-shadow: 0 0 6px var(--led-ok); }
+.led.idle::before { background: var(--led-idle); }
+.proj h3 { font-size: 1.25rem; font-weight: 700; overflow-wrap: anywhere; }
+.proj p { margin: 0; color: var(--muted); font-size: .94rem; }
+.specs { display: flex; gap: 14px; flex-wrap: wrap; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--line); font-family: var(--f-mono); font-size: .76rem; color: var(--muted); }
+.specs b { color: var(--ink); font-weight: 500; }
+.status { margin-top: 14px; font-family: var(--f-mono); font-size: .85rem; color: var(--muted); }
+.skeleton { height: 150px; border-radius: 6px; border: 1.5px dashed var(--line); }
+
+/* ---------- Work ---------- */
+.runs { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.runs li { display: grid; grid-template-columns: 130px 1fr; gap: 4px 20px; padding: 16px 18px; background: var(--surface); border-left: 4px solid var(--pipe); border-radius: 0 6px 6px 0; }
+.runs li.current { border-left-color: var(--accent); }
+.runs .when { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); padding-top: 3px; }
+.runs .role { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; }
+.runs .org { color: var(--accent); font-weight: 500; font-family: var(--f-body); font-size: 1rem; }
+.runs p { margin: 2px 0 0; color: var(--muted); font-size: .94rem; }
+@media (max-width: 560px) { .runs li { grid-template-columns: 1fr; } }
+
+.bin { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.bin span { font-family: var(--f-mono); font-size: .8rem; padding: 5px 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 4px; }
+.bin span::before { content: "▪ "; color: var(--accent); }
+
+/* ---------- Contact ---------- */
+.sink { background: var(--ink); color: var(--surface); border-radius: 8px; padding: 28px; }
+.sink h2 { color: var(--surface); margin-top: 0; }
+.sink p { color: color-mix(in srgb, var(--surface) 70%, transparent); margin: 10px 0 0; }
+.email-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 20px; }
+.email-row code { font-family: var(--f-mono); font-size: clamp(1rem, 3vw, 1.3rem); user-select: all; overflow-wrap: anywhere; min-width: 0; }
+button.copy { font: 500 .85rem var(--f-mono); padding: 8px 14px; border: 2px solid var(--accent); border-radius: 4px; background: var(--accent); color: var(--ink); cursor: pointer; }
+button.copy:hover { filter: brightness(1.1); }
+
+footer .wrap { padding-block: 8px 40px; font-family: var(--f-mono); font-size: .78rem; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 560px) {
+  :root { --pipe-x: 12px; }
+  .pipeline { padding-left: calc(var(--pipe-x) + 26px); }
+  .joint { left: calc(-26px - 13px); width: 26px; height: 26px; font-size: .66rem; }
+}
+</style>
+
+<div class="top">
+  <div class="wrap">
+    <a class="logo" href="#hello">atul<span>::</span>pipeline</a>
+    <nav aria-label="Sections">
+      <a href="#projects">projects</a>
+      <a href="#work">work</a>
+      <a href="#contact">contact</a>
+      <a id="gh-link" href="#projects" target="_blank" rel="noopener">github ↗</a>
+    </nav>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="pipeline" id="pipeline">
+    <div class="flow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+    <section class="stage" id="hello">
+      <span class="joint" aria-hidden="true">01</span>
+      <div class="hero">
+        <div class="hero-text">
+          <div class="stage-label"><b>ingest</b> · hello</div>
+          <h1>Atul Krishnan S</h1>
+          <p class="tagline"><b>Software engineer</b> and <b>senior data engineer</b>. I build pipelines and platforms, and tinker with the tools around them.</p>
+        </div>
+        <div class="plate">
+          <span class="screw-b"></span>
+          <div class="plate-title">SPEC PLATE</div>
+          <dl>
+            <dt>Model</dt><dd>AKS · software + data</dd>
+            <dt>Runs on</dt><dd>Python, SQL, Scala</dd>
+            <dt>Built in</dt><dd>Kochi, India</dd>
+            <dt>Uptime</dt><dd>4.5 yrs in production</dd>
+          </dl>
+          <button class="valve" id="valve" type="button" aria-pressed="true">
+            <span class="knob" aria-hidden="true"></span><span id="valve-text">flow: on · click to close the valve</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="projects">
+      <span class="joint" aria-hidden="true">02</span>
+      <div class="stage-head">
+        <div>
+          <div class="stage-label"><b>transform</b> · things I've built</div>
+          <h2>Projects</h2>
+        </div>
+        <span class="note" id="proj-note">source: github</span>
+      </div>
+      <div class="projects" id="project-list">
+        <div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+      <p class="status" id="proj-status" hidden></p>
+    </section>
+
+    <section class="stage" id="work">
+      <span class="joint" aria-hidden="true">03</span>
+      <div class="stage-head">
+        <div>
+          <div class="stage-label"><b>load</b> · where I've shipped</div>
+          <h2>Work</h2>
+        </div>
+      </div>
+      <ul class="runs">
+        <li class="current">
+          <div class="when">2025 – now</div>
+          <div><div class="role">Senior Data Engineer <span class="org">@ Keyvalue</span></div>
+          <p>Lakehouse platform on S3, Iceberg, dbt and Airflow, with PII governance and event-driven health data pipelines.</p></div>
+        </li>
+        <li>
+          <div class="when">2022 – 2025</div>
+          <div><div class="role">Big Data Engineer <span class="org">@ Prevalent AI</span></div>
+          <p>Spark pipelines unifying terabytes of enterprise data from ~20 sources into one entity inventory.</p></div>
+        </li>
+        <li>
+          <div class="when">2021</div>
+          <div><div class="role">Software Engineer Intern <span class="org">@ Curiosity</span></div>
+          <p>Block-coding web apps used by 100,000+ children.</p></div>
+        </li>
+      </ul>
+      <div class="bin" aria-label="Tools">
+        <span>python</span><span>sql</span><span>scala</span><span>spark</span><span>airflow</span><span>dbt</span><span>iceberg</span><span>aws</span><span>docker</span>
+      </div>
+    </section>
+
+    <section class="stage" id="contact">
+      <span class="joint" aria-hidden="true">04</span>
+      <div class="stage-label" style="margin-bottom:12px"><b>serve</b> · end of the line</div>
+      <div class="sink">
+        <h2>Send a message down the pipe</h2>
+        <p>Data platforms, side projects, or a role on your team. Email reaches me fastest.</p>
+        <div class="email-row">
+          <code id="email">s.athulkrishnan100@gmail.com</code>
+          <button class="copy" id="copy-email" type="button">copy</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap"><span>© <span id="yr">2026</span> Atul Krishnan S</span><span>status: all stages green</span></div>
+</footer>
+
+<script>
+/* ============================================================
+   SETTINGS
+   GITHUB_USER: your GitHub username.
+   TOPIC: on GitHub, add this topic to any repo you want listed
+          (repo page → About → ⚙ → Topics). Untag to hide it.
+   ============================================================ */
+const GITHUB_USER = "foolinthepool";
+const TOPIC = "portfolio";
+
+/* Shown only when GitHub can't be reached (or no username is set yet). */
+const EXAMPLES = [
+  { name: "lakehouse-starter", description: "Medallion pipeline template with Airflow, dbt and Apache Iceberg on S3.", language: "Python", stargazers_count: 0, pushed_at: null, topics: [], html_url: "#" },
+  { name: "spark-skew-lab", description: "Experiments with salting and AQE to fix skewed joins in Spark.", language: "Scala", stargazers_count: 0, pushed_at: null, topics: [], html_url: "#" }
+];
+
+const listEl = document.getElementById("project-list");
+const statusEl = document.getElementById("proj-status");
+const noteEl = document.getElementById("proj-note");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pretty = n => n.replace(/[-_]+/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+const days = iso => iso ? (Date.now() - new Date(iso)) / 864e5 : null;
+const ago = d => d == null ? "–" : d < 1 ? "today" : d < 30 ? Math.round(d) + "d ago" : d < 365 ? Math.round(d / 30) + "mo ago" : Math.round(d / 365) + "y ago";
+const userSet = GITHUB_USER && GITHUB_USER !== "your-github-username";
+
+if (userSet) document.getElementById("gh-link").href = "https://github.com/" + encodeURIComponent(GITHUB_USER);
+else document.getElementById("gh-link").hidden = true;
+
+function card(r, i, isExample) {
+  const d = days(r.pushed_at);
+  const led = isExample ? '<span class="led">example</span>'
+    : d != null && d < 90 ? '<span class="led ok">active</span>' : '<span class="led idle">idle</span>';
+  const href = isExample ? "#projects" : (r.homepage || r.html_url);
+  return `<a class="proj" href="${esc(href)}" ${isExample ? "" : 'target="_blank" rel="noopener"'}>
+    <div class="proj-top"><span>part ${String(i + 1).padStart(2, "0")}</span>${led}</div>
+    <h3>${esc(pretty(r.name))}</h3>
+    ${r.description ? `<p>${esc(r.description)}</p>` : ""}
+    <div class="specs">
+      <span>lang <b>${esc(r.language || "–")}</b></span>
+      <span>★ <b>${r.stargazers_count || 0}</b></span>
+      <span>pushed <b>${ago(d)}</b></span>
+    </div>
+  </a>`;
+}
+
+function show(repos, isExample, message) {
+  listEl.innerHTML = repos.map((r, i) => card(r, i, isExample)).join("");
+  statusEl.hidden = !message;
+  statusEl.textContent = message || "";
+  noteEl.textContent = isExample ? "source: examples" : `source: github.com/${GITHUB_USER} · ${repos.length} parts`;
+}
+
+async function loadRepos() {
+  if (!userSet) return show(EXAMPLES, true, "Set GITHUB_USER in the page settings to load your repositories.");
+  const key = "gh-repos-" + GITHUB_USER;
+  try {
+    const c = JSON.parse(localStorage.getItem(key) || "null");
+    if (c && Date.now() - c.t < 36e5) return render(c.repos);
+  } catch (e) {}
+  try {
+    const res = await fetch(`https://api.github.com/users/${encodeURIComponent(GITHUB_USER)}/repos?per_page=100&sort=pushed`, { headers: { Accept: "application/vnd.github+json" } });
+    if (!res.ok) throw new Error(res.status === 403 ? "GitHub rate limit reached. Try again in a few minutes." : "GitHub returned " + res.status);
+    const repos = await res.json();
+    try { localStorage.setItem(key, JSON.stringify({ t: Date.now(), repos })); } catch (e) {}
+    render(repos);
+  } catch (err) {
+    show(EXAMPLES, true, "Couldn't reach GitHub. " + (err.message && err.message.startsWith("GitHub") ? err.message : "Showing examples."));
+  }
+}
+
+function render(repos) {
+  const picked = repos
+    .filter(r => !r.fork && !r.archived && (r.topics || []).includes(TOPIC))
+    .sort((a, b) => (b.stargazers_count - a.stargazers_count) || (new Date(b.pushed_at) - new Date(a.pushed_at)));
+  if (!picked.length) {
+    listEl.innerHTML = "";
+    statusEl.hidden = false;
+    statusEl.textContent = `No repositories tagged "${TOPIC}" yet. Add that topic to a repo on GitHub and it will show here.`;
+    noteEl.textContent = "source: github";
+    return;
+  }
+  show(picked, false, "");
+}
+loadRepos();
+
+/* Valve: start / stop the flow */
+const valve = document.getElementById("valve");
+const pipeline = document.getElementById("pipeline");
+let open = true;
+try { if (localStorage.getItem("valve") === "closed") open = false; } catch (e) {}
+function setValve() {
+  valve.setAttribute("aria-pressed", String(open));
+  pipeline.classList.toggle("paused", !open);
+  document.getElementById("valve-text").textContent = open ? "flow: on · click to close the valve" : "flow: off · click to open the valve";
+}
+valve.addEventListener("click", () => {
+  open = !open; setValve();
+  try { localStorage.setItem("valve", open ? "open" : "closed"); } catch (e) {}
+});
+setValve();
+
+/* Copy email */
+document.getElementById("copy-email").addEventListener("click", e => {
+  const btn = e.currentTarget;
+  const el = document.getElementById("email");
+  const ok = () => { btn.textContent = "copied ✓"; setTimeout(() => btn.textContent = "copy", 1600); };
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(el.textContent).then(ok, fallback);
+  else fallback();
+});
+document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
