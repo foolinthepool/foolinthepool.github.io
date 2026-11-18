@@ -346,7 +346,7 @@ function show(repos, isExample, message) {
   listEl.innerHTML = repos.map((r, i) => card(r, i, isExample)).join("");
   statusEl.hidden = !message;
   statusEl.textContent = message || "";
-  noteEl.textContent = isExample ? "source: examples" : `source: github.com/${GITHUB_USER} · ${repos.length} parts`;
+  noteEl.textContent = isExample ? "source: examples" : `source: github.com/${GITHUB_USER} · ${repos.length} ${repos.length === 1 ? "part" : "parts"}`;
 }
 
 async function loadRepos() {
